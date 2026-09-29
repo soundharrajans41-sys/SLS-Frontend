@@ -26,11 +26,22 @@ export default function Register() {
       setSuccess(true);
       setTimeout(() => navigate("/login"), 1200);
     } catch (err) {
-      const data = err.response?.data;
-      if (data && typeof data === "object" && !data.message) {
-        setFieldErrors(data);
+      if (err.response) {
+        const data = err.response.data;
+        if (data && typeof data === "object" && !data.message && !data.error) {
+          setFieldErrors(data);
+        } else {
+          setError(
+            (typeof data === "string" ? data : null) ||
+            data?.message ||
+            data?.error ||
+            "Registration failed"
+          );
+        }
+      } else if (err.request) {
+        setError("Unable to connect to server. Please check if the backend is running.");
       } else {
-        setError(data?.message || "Registration failed");
+        setError(err.message || "Registration failed");
       }
     } finally {
       setLoading(false);

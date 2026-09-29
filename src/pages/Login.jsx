@@ -24,7 +24,19 @@ export default function Login() {
       await login(form);
       navigate(from, { replace: true });
     } catch (err) {
-      setError(err.response?.data?.message || "Invalid username or password");
+      if (err.response) {
+        const data = err.response.data;
+        setError(
+          (typeof data === "string" ? data : null) ||
+          data?.message ||
+          data?.error ||
+          "Invalid username or password"
+        );
+      } else if (err.request) {
+        setError("Unable to connect to server. Please check if the backend is running.");
+      } else {
+        setError(err.message || "Invalid username or password");
+      }
     } finally {
       setLoading(false);
     }
